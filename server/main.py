@@ -7,6 +7,12 @@ from app import app
 from flask import Flask, request, redirect
 from werkzeug.utils import secure_filename
 
+@app.route('/upload',methods=['GET'])
+def upload_get_request():
+	print("Received the GET request")
+	response = {"Message": "Received the request"}
+	return response
+
 
 @app.route('/upload',methods=['POST'])
 def upload_file():
@@ -35,4 +41,4 @@ def upload_file():
 		return response
 
 if __name__ == "__main__":
-	app.run()
+	app.run(host="192.168.0.51", port=5000)
