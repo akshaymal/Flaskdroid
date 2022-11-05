@@ -28,16 +28,25 @@ class DLModel():
         self.input_shape = input_shape
 
 
-    def preprocess_data(self):
-        # Scale images to the [0, 1] range
-        self.x_train = self.x_train.astype("float32") / 255
-        self.x_test = self.x_test.astype("float32") / 255
+    def preprocess_data(self, custom_data=None, input=None):
+        if custom_data is None:
+            # Scale images to the [0, 1] range
+            self.x_train = self.x_train.astype("float32") / 255
+            self.x_test = self.x_test.astype("float32") / 255
 
-        self.x_train = np.expand_dims(self.x_train, -1)
-        self.x_test = np.expand_dims(self.x_test, -1)
+            self.x_train = np.expand_dims(self.x_train, -1)
+            self.x_test = np.expand_dims(self.x_test, -1)
 
-        self.y_train = tf.keras.utils.to_categorical(self.y_train, self.number_of_classes)
-        self.y_test = tf.keras.utils.to_categorical(self.y_test, self.number_of_classes)
+            self.y_train = tf.keras.utils.to_categorical(self.y_train, self.number_of_classes)
+            self.y_test = tf.keras.utils.to_categorical(self.y_test, self.number_of_classes)
+        else:
+            if input:
+                custom_data = custom_data.astype("float32") / 255
+                custom_data = np.expand_dims(custom_data, -1)
+            else:
+                custom_data = tf.keras.utils.to_categorical(custom_data, self.number_of_classes)
+            return custom_data
+
 
     def train(self):
         batch_size = 128
