@@ -23,9 +23,8 @@ def upload_file():
 	appropriate directory.
 	"""
 	from app import classifier
-	label = None
+	label = -1
 	storage_status = "Not Saved!"
-
 
 	# HTTP Error Handling
 	if "file" not in request.files and request.files["file"] != "":
@@ -35,12 +34,13 @@ def upload_file():
 
 	# Process input result and obtain classification result
 	file = request.files["file"]
-	input_image = Image.open(file).convert('L')
-	input_image = input_image.resize((28,28))
-	np_input_image = np.array(input_image)
-	np_input_image = np.expand_dims(np_input_image, 0)
-	np_input_image = classifier.preprocess_data(custom_data=np_input_image, input=True)
-	predict_results = classifier.model.predict(np_input_image)
+	image_to_save = Image.open(file)
+	image_to_classify = image_to_save.convert('L')
+	image_to_classify = image_to_classify.resize((28,28))
+	image_to_classify = np.array(image_to_classify)
+	image_to_classify = np.expand_dims(image_to_classify, 0)
+	image_to_classify = classifier.preprocess_data(custom_data=image_to_classify, input=True)
+	predict_results = classifier.model.predict(image_to_classify)
 	label = np.argmax(predict_results)
 
 
@@ -50,7 +50,7 @@ def upload_file():
 	folders = os.listdir(app.config["base_folder"])
 	if str(label) not in folders:
 		os.mkdir(category_path)
-	file.save(os.path.join(category_path, filename))
+	image_to_save.save(os.path.join(category_path, filename))
 	storage_status = 'Saved!'
 
 	response = {"predict_label": str(label), "storage_status": storage_status}
@@ -59,4 +59,4 @@ def upload_file():
 
 
 if __name__ == "__main__":
-    app.run(host="192.168.0.51", port=5000)
+	app.run(host="localhost", port=7878)

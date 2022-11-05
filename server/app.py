@@ -1,5 +1,6 @@
 import os
 import tensorflow as tf
+import tensorflow_datasets as tfds
 
 from flask import Flask
 from dl_model import DLModel
@@ -13,7 +14,9 @@ classifier = None
 def init_app():
     """Initialize the core application."""
     app = Flask(__name__)
-    base_folder = str(os.getcwd()) + "/images/"
+    base_folder = os.path.join(os.getcwd(), "images")
+    if not (os.path.exists(base_folder)):
+        os.mkdir(base_folder)
     app.config['base_folder'] = base_folder
 
     with app.app_context():
