@@ -1,18 +1,25 @@
 import os
-import json
-import urllib.request
+import tensorflow as tf
 
 from app import app
-
-from flask import Flask, request, redirect
+from flask import request
 from werkzeug.utils import secure_filename
+from dl_model import DLModel
+
+@app.before_first_request
+def setup():
+	global MODEL
+	(x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
+	MODEL = DLModel()
+	MODEL.input_data(x_train, y_train, x_test, y_test, (28,28,1))
+	MODEL.preprocess_data()
+	MODEL.train()
 
 @app.route('/upload',methods=['GET'])
 def upload_get_request():
 	print("Received the GET request")
 	response = {"Message": "Received the request"}
 	return response
-
 
 @app.route('/upload',methods=['POST'])
 def upload_file():
