@@ -1,7 +1,7 @@
 import os
 import numpy as np
 
-from PIL import Image
+from PIL import Image ,ImageOps
 from app import init_app
 from flask import request
 from werkzeug.utils import secure_filename
@@ -36,6 +36,7 @@ def upload_file():
 	file = request.files["file"]
 	image_to_save = Image.open(file)
 	image_to_classify = image_to_save.convert('L')
+	image_to_classify = ImageOps.invert(image_to_classify)
 	image_to_classify = image_to_classify.resize((28,28))
 	image_to_classify = np.array(image_to_classify)
 	image_to_classify = np.expand_dims(image_to_classify, 0)
