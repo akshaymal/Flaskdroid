@@ -72,10 +72,11 @@ class SecondFragment : Fragment() {
 
         imageView.setImageBitmap(rotatedBitmap)
 
-        val categories = resources.getStringArray(R.array.Categories)
-        val adapter = ArrayAdapter<String>(requireActivity(),
-            android.R.layout.simple_spinner_item, categories)
-        category_spinner.adapter = adapter
+//        val categories = resources.getStringArray(R.array.Categories)
+//        val adapter = ArrayAdapter<String>(requireActivity(),
+//            android.R.layout.simple_spinner_item, categories)
+//        category_spinner.adapter = adapter
+        val default_category = "Car"
 
         binding.buttonSecond.setOnClickListener {
             Navigation.findNavController(requireView()).navigate(R.id.action_SecondFragment_to_FirstFragment)
@@ -87,7 +88,7 @@ class SecondFragment : Fragment() {
             val image = stream.toByteArray()
             val filename = imgPath?.split("/")?.get(imgPath?.split("/")!!.size-1)
 
-            sendImage(category_spinner.selectedItem.toString(), filename.toString(), image)
+            sendImage(default_category, filename.toString(), image)
         }
     }
 

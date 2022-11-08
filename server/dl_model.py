@@ -48,14 +48,39 @@ class DLModel():
             return custom_data
 
 
-    def train(self):
-        batch_size = 128
-        epochs = 15
-        self.model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
-        self.model.fit(self.x_train, self.y_train, batch_size=batch_size, epochs=epochs, validation_split=0.1)
-        score = self.model.evaluate(self.x_test, self.y_test, verbose=0)
+    def train(self, model_path):
+        model_exists = False
+        try:
+            model = tf.keras.models.load_model(model_path)
+            model_exists = True
+        except:
+            print("Model doesn\'t exists. Training it.")
+            model_exists = False
+        if model_exists:
+            self.model = model
+        else:
+            batch_size = 128
+            epochs = 15
+            self.model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
+            self.model.fit(self.x_train, self.y_train, batch_size=batch_size, epochs=epochs, validation_split=0.1)
+
+
+            self.model.save(model_path)
+
+
+        # score = self.model.evaluate(self.x_test, self.y_test, verbose=0)
+        # print("Test loss:", score[0])
+        # print("Test accuracy:", score[1])
+
+    def test(self, model_path):
+        print("Loading saved model:")
+        model_v = tf.keras.models.load_model(model_path)
+
+        print("Evaluating model on test set:")
+        score = model_v.evaluate(self.x_test, self.y_test, verbose=0)
         print("Test loss:", score[0])
         print("Test accuracy:", score[1])
+
 
     def get_model(self):
         return self.model
