@@ -95,7 +95,7 @@ class SecondFragment : Fragment() {
     fun sendImage(cat: String, filename: String, image: ByteArray){
         imageData = image
         val queue = Volley.newRequestQueue(thisContext)
-        val url = "http://192.168.0.51:5000/upload"
+        val url = "http://192.168.0.141:8080/upload"
         val request = object : VolleyFileUploadRequest(
             Method.POST,
             url,

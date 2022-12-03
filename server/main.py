@@ -150,4 +150,4 @@ def upload_file():
 
 
 if __name__ == "__main__":
-	app.run(host="192.168.0.141", port=8080)
+	app.run(host="192.168.0.51", port=8080)
