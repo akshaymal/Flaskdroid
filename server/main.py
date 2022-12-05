@@ -127,9 +127,16 @@ def upload_file():
 	# TO REMOVE
 	rgbimage = cv2.cvtColor(gray, cv2.COLOR_GRAY2RGB)
 
+
+
+	# Model related
 	rgbimage = np.expand_dims(rgbimage, 0)
-	gray_im = classifier.preprocess_data(custom_data=rgbimage, input=True)
-	predict_results = classifier.model.predict(gray_im)
+	# gray_im = classifier.preprocess_data(custom_data=rgbimage, input=True)
+	# predict_results = classifier.model.predict(gray_im)
+
+
+	predict_results = classifier.predict(rgbimage)
+	print(predict_results)
 
 	label = np.argmax(predict_results)
 	print("Prediction:")
@@ -153,4 +160,4 @@ def upload_file():
 
 
 if __name__ == "__main__":
-	app.run(host="192.168.0.216", port=8080)
+	app.run(host="192.168.0.51", port=8080)
