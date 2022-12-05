@@ -6,7 +6,10 @@ from flask import Flask
 from dl_model import DLModel
 
 classifier = None
-model_folder_name = "model_zoo"
+# BOTTOM LEFT
+model_folder_name = "bl_model_zoo"
+
+
 #
 # app = Flask(__name__)
 # base_folder = str(os.getcwd()) + "/../../images/"
@@ -22,12 +25,13 @@ def init_app():
     app.config['base_folder'] = base_folder
 
     with app.app_context():
-        (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
+        # (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
         global classifier
-        classifier = DLModel()
-        classifier.input_data(x_train, y_train, x_test, y_test, (28, 28, 1))
-        classifier.preprocess_data()
-        classifier.train(model_path)
-        classifier.test(model_path)
+        classifier = tf.keras.models.load_model(model_path)
+        # classifier = DLModel()
+        # classifier.input_data(x_train, y_train, x_test, y_test, (28, 28, 1))
+        # classifier.preprocess_data()
+        # classifier.train(model_path)
+        # classifier.test(model_path)
 
         return app

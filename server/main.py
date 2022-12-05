@@ -79,8 +79,8 @@ def upload_file():
 	kernel = np.ones((10, 10), np.uint8)
 	gray = cv2.morphologyEx(gray, cv2.MORPH_CLOSE, kernel)
 	cv2.imwrite("images/gray_4_closed.jpg", gray)
-	# Resizing into 28x28
-	gray = cv2.resize(gray, (28, 28), interpolation=cv2.INTER_AREA)
+	# Resizing into 224x224
+	gray = cv2.resize(gray, (224, 224), interpolation=cv2.INTER_AREA)
 	(thresh, gray) = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
 	cv2.imwrite("images/gray_5_resized.jpg", gray)
 	cv2.imwrite("images/thresh.jpg", thresh)
@@ -121,12 +121,22 @@ def upload_file():
                  cv2.BORDER_CONSTANT, 
                  value=0
               )
-	gray = cv2.resize(gray, (28, 28), interpolation=cv2.INTER_AREA)
+	gray = cv2.resize(gray, (224, 224), interpolation=cv2.INTER_AREA)
 	cv2.imwrite("images/gray_final.jpg", gray)
 
-	gray = np.expand_dims(gray, 0)
-	gray_im = classifier.preprocess_data(custom_data=gray, input=True)
-	predict_results = classifier.model.predict(gray_im)
+	# TO REMOVE
+	rgbimage = cv2.cvtColor(gray, cv2.COLOR_GRAY2RGB)
+
+
+
+	# Model related
+	rgbimage = np.expand_dims(rgbimage, 0)
+	# gray_im = classifier.preprocess_data(custom_data=rgbimage, input=True)
+	# predict_results = classifier.model.predict(gray_im)
+
+
+	predict_results = classifier.predict(rgbimage)
+	print(predict_results)
 
 	label = np.argmax(predict_results)
 	print("Prediction:")
@@ -144,7 +154,7 @@ def upload_file():
 	image_to_save.save(os.path.join(category_path, filename))
 	storage_status = 'Saved!'
 
-	response = {"predict_label": str(label), "storage_status": storage_status}
+	response = {"predict_label": str(label), "storage_status": storage_status, "confidence": predict_results.tolist()[0]}
 	response["status_code"] = 201
 	return response
 
