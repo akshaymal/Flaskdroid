@@ -71,7 +71,7 @@ class SecondFragment : Fragment() {
 
         val bitmap = BitmapFactory.decodeFile(File(imgPath).toString())
 
-        val matrix = Matrix()
+        var matrix = Matrix()
         matrix.postRotate(90F)
 //        val scaledBitmap = Bitmap.createScaledBitmap(bitmap, width, height, true)
 
@@ -102,13 +102,13 @@ class SecondFragment : Fragment() {
         }
 
         binding.buttonUpload.setOnClickListener {
-            val bitmap_tl = Bitmap.createBitmap(rotatedBitmap, 0, rotatedBitmap.height/2, rotatedBitmap.width/2, rotatedBitmap.height/2, matrix,true)
+            val bitmap_tl = Bitmap.createBitmap(rotatedBitmap, 0, 0, rotatedBitmap.width/2, rotatedBitmap.height/2, null,true)
             sendImage(0, default_category, imgPath, bitmap_tl)  //TL
-            val bitmap_tr = Bitmap.createBitmap(rotatedBitmap, 0, 0, rotatedBitmap.width/2, rotatedBitmap.height/2, matrix,true)
+            val bitmap_tr = Bitmap.createBitmap(rotatedBitmap, rotatedBitmap.width/2, 0, rotatedBitmap.width/2, rotatedBitmap.height/2, null,true)
             sendImage(1, default_category, imgPath, bitmap_tr)  //TR
-            val bitmap_bl = Bitmap.createBitmap(rotatedBitmap, rotatedBitmap.width/2, rotatedBitmap.height/2, rotatedBitmap.width/2, bitmap.height/2, matrix,true)
+            val bitmap_bl = Bitmap.createBitmap(rotatedBitmap, 0, rotatedBitmap.height/2, rotatedBitmap.width/2, rotatedBitmap.height/2, null,true)
             sendImage(2, default_category, imgPath, bitmap_bl)  //BL
-            val bitmap_br = Bitmap.createBitmap(rotatedBitmap, rotatedBitmap.width/2, 0, rotatedBitmap.width/2, rotatedBitmap.height/2, matrix,true)
+            val bitmap_br = Bitmap.createBitmap(rotatedBitmap, rotatedBitmap.width/2, rotatedBitmap.height/2, rotatedBitmap.width/2, bitmap.height/2, null,true)
             sendImage(3, default_category, imgPath, bitmap_br)  //BR
         }
     }

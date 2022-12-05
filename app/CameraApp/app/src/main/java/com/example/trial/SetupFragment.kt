@@ -55,7 +55,7 @@ class SetupFragment : Fragment() {
             val ipPort = ":8080/upload"
             val ipPre = "http://"
             var ip0 = ipPre + tlIPText.text.toString() + ipPort
-            var ip1 = ipPre + trIPText.text.toString() + ipPort
+            var ip1 = ipPre + trIPText.text.toString() + ":8000/upload"
             var ip2 = ipPre + blIPText.text.toString() + ipPort
             var ip3 = ipPre + brIPText.text.toString() + ipPort
             val args = Bundle()
@@ -69,10 +69,10 @@ class SetupFragment : Fragment() {
         binding.setDefaultButton.setOnClickListener {
             val ipDef = "http://192.168.0.141"
             var ipPort = ":8080/upload"
-            var ip0 = ipDef + ipPort
-            var ip1 = ipDef + ipPort
-            var ip2 = ipDef + ipPort
-            var ip3 = ipDef + ipPort
+            var ip0 = "http://192.168.0.141:8080/upload"
+            var ip1 = "http://192.168.0.141:8000/upload"
+            var ip2 = "http://192.168.0.216:8080/upload"
+            var ip3 = "http://192.168.0.51:8080/upload"
             val args = Bundle()
             args.putString("ip0", ip0)
             args.putString("ip1", ip1)
