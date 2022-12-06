@@ -107,6 +107,7 @@ class SecondFragment : Fragment() {
             val bitmapBl = Bitmap.createBitmap(rotatedBitmap, 0, rotatedBitmap.height/2, rotatedBitmap.width/2, rotatedBitmap.height/2, null,true)
             val bitmapBr = Bitmap.createBitmap(rotatedBitmap, rotatedBitmap.width/2, rotatedBitmap.height/2, rotatedBitmap.width/2, bitmap.height/2, null,true)
 
+//            sendImage(0, defaultCategory, imgPath, rotatedBitmap)  //TL
 //            sendImage(0, defaultCategory, imgPath, bitmapBl)  //TL
 
             sendImage(0, defaultCategory, imgPath, bitmapTl)  //TL
