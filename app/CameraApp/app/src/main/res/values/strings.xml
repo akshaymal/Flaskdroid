@@ -2,9 +2,11 @@
     <string name="app_name">Trial</string>
     <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
+    <string name="setup_fragment_label">Setup Fragment</string>
     <string name="first_fragment_label">First Fragment</string>
     <string name="cam_fragment_label">Camera Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>
+    <string name="third_fragment_label">Third Fragment</string>
     <string name="next">Capture Image</string>
     <string name="upload">Upload</string>
     <string name="discard">Discard</string>
