@@ -146,6 +146,8 @@ def upload_file():
 	label = np.argmax(predict_results)
 	print("Prediction:")
 	print(predict_results*100)
+	pred = np.round(predict_results*100,3)
+	print(np.round(predict_results,3))
 	print("Label:")
 	print(label)
 
@@ -159,8 +161,9 @@ def upload_file():
 	image_to_save.save(os.path.join(category_path, filename))
 	storage_status = 'Saved!'
 
-	response = {"predict_label": str(label), "storage_status": storage_status, "confidence": predict_results.tolist()[0]}
+	response = {"predict_label": str(label), "storage_status": storage_status, "confidence": pred.tolist()[0]}
 	response["status_code"] = 201
+	print(response)
 	return response
 
 
