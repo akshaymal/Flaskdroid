@@ -7,7 +7,7 @@ from dl_model import DLModel
 
 classifier = None
 # BOTTOM LEFT
-model_folder_name = "bl_model_zoo"
+model_folder_name = "tr_model"
 
 
 #
@@ -27,8 +27,9 @@ def init_app():
     with app.app_context():
         # (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
         global classifier
-        classifier = tf.keras.models.load_model(model_path)
+        # classifier = tf.keras.models.load_model(model_path)
         # classifier = DLModel()
+        classifier = tf.keras.models.load_model(model_path)
         # classifier.input_data(x_train, y_train, x_test, y_test, (28, 28, 1))
         # classifier.preprocess_data()
         # classifier.train(model_path)

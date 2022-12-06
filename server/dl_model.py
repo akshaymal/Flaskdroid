@@ -6,7 +6,7 @@ from keras import layers
 class DLModel():
     def __init__(self):
         self.number_of_classes = 10
-        self.input_shape = (28,28,1)
+        self.input_shape = (224,224,1)
         self.model = tf.keras.Sequential(
             [
                 tf.keras.Input(shape=self.input_shape),

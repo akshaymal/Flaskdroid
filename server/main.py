@@ -93,49 +93,54 @@ def upload_file():
 	contours, hierarchy  = cv2.findContours(gray, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 	c = max(contours, key = cv2.contourArea)
 	x,y,w,h = cv2.boundingRect(c)
-	foreground = gray[y:y+h,x:x+w]
-	if h > w:
-		out_h = 20
-		out_w = (20 * w) // h
-		topBorder = 4
-		botBorder = 4
-		leftBorder = 14 - (out_w // 2)
-		rightBorder = 14 - (out_w // 2)
-	else:
-		out_h = (20 * h) // w
-		out_w = 20
-		topBorder = 14 - (out_h // 2)
-		botBorder = 14 - (out_h // 2)
-		leftBorder = 4
-		rightBorder = 4
-	dim = (out_w, out_h)
+	# foreground = gray[y:y+h,x:x+w]
+	# if h > w:
+	# 	out_h = 20
+	# 	out_w = (20 * w) // h
+	# 	topBorder = 4
+	# 	botBorder = 4
+	# 	leftBorder = 14 - (out_w // 2)
+	# 	rightBorder = 14 - (out_w // 2)
+	# else:
+	# 	out_h = (20 * h) // w
+	# 	out_w = 20
+	# 	topBorder = 14 - (out_h // 2)
+	# 	botBorder = 14 - (out_h // 2)
+	# 	leftBorder = 4
+	# 	rightBorder = 4
+	# dim = (out_w, out_h)
 	
-	foreground = cv2.resize(foreground, dim, interpolation = cv2.INTER_AREA)
-	cv2.imwrite("images/fore.jpg", foreground)
-	gray = cv2.copyMakeBorder(
-                 foreground,
-				 topBorder,
-				 botBorder,
-				 leftBorder,
-				 rightBorder,
-                 cv2.BORDER_CONSTANT, 
-                 value=0
-              )
-	gray = cv2.resize(gray, (224, 224), interpolation=cv2.INTER_AREA)
+	# foreground = cv2.resize(foreground, dim, interpolation = cv2.INTER_AREA)
+	# cv2.imwrite("images/fore.jpg", foreground)
+	# gray = cv2.copyMakeBorder(
+    #              foreground,
+	# 			 topBorder,
+	# 			 botBorder,
+	# 			 leftBorder,
+	# 			 rightBorder,
+    #              cv2.BORDER_CONSTANT, 
+    #              value=0
+    #           )
+	# gray = cv2.resize(gray, (224, 224), interpolation=cv2.INTER_AREA)
 	cv2.imwrite("images/gray_final.jpg", gray)
+	print(gray.shape)
 
 	# TO REMOVE
-	rgbimage = cv2.cvtColor(gray, cv2.COLOR_GRAY2RGB)
+	# rgbimage = cv2.cvtColor(gray, cv2.COLOR_GRAY2RGB)
 
 
 
 	# Model related
-	rgbimage = np.expand_dims(rgbimage, 0)
-	# gray_im = classifier.preprocess_data(custom_data=rgbimage, input=True)
-	# predict_results = classifier.model.predict(gray_im)
+	gray = gray.astype("float32") / 255
+	gray_im = np.expand_dims(gray, 0)
+	# gray_im = classifier.preprocess_data(custom_data=gray, input=True)
+	print(gray_im.shape)
 
 
-	predict_results = classifier.predict(rgbimage)
+	predict_results = classifier.predict(gray_im)
+
+
+	# predict_results = classifier.predict(rgbimage)
 	print(predict_results)
 
 	label = np.argmax(predict_results)
