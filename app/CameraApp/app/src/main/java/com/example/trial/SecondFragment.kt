@@ -18,11 +18,15 @@ import androidx.navigation.fragment.findNavController
 import com.android.volley.Response
 import com.android.volley.toolbox.Volley
 import com.example.trial.databinding.FragmentSecondBinding
+import com.example.trial.ml.Comb
 import kotlinx.android.synthetic.main.fragment_second.*
 import org.json.JSONArray
 import org.json.JSONObject
+import org.tensorflow.lite.DataType
+import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.nio.ByteBuffer
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
@@ -43,11 +47,11 @@ class SecondFragment : Fragment() {
 
     private var imageData: ByteArray? = null
 
-    private var imgs: Int = 1
+    private var imgs: Int = 4
     private var responseData: Array<JSONObject?> = Array(imgs) { null }
     private var responseCount: Int = 0
     private var failureCount: Int = 0
-    private var ip: Array<String> = Array(imgs) { "" }
+    private var ip: Array<String> = Array(imgs + 1) { "" }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -102,18 +106,19 @@ class SecondFragment : Fragment() {
         }
 
         binding.buttonUpload.setOnClickListener {
+//            sendImage(4, defaultCategory, imgPath, rotatedBitmap)  //TL
+
             val bitmapTl = Bitmap.createBitmap(rotatedBitmap, 0, 0, rotatedBitmap.width/2, rotatedBitmap.height/2, null,true)
             val bitmapTr = Bitmap.createBitmap(rotatedBitmap, rotatedBitmap.width/2, 0, rotatedBitmap.width/2, rotatedBitmap.height/2, null,true)
             val bitmapBl = Bitmap.createBitmap(rotatedBitmap, 0, rotatedBitmap.height/2, rotatedBitmap.width/2, rotatedBitmap.height/2, null,true)
             val bitmapBr = Bitmap.createBitmap(rotatedBitmap, rotatedBitmap.width/2, rotatedBitmap.height/2, rotatedBitmap.width/2, bitmap.height/2, null,true)
 
-//            sendImage(0, defaultCategory, imgPath, rotatedBitmap)  //TL
-//            sendImage(0, defaultCategory, imgPath, bitmapBl)  //TL
-
             sendImage(0, defaultCategory, imgPath, bitmapTl)  //TL
             sendImage(1, defaultCategory, imgPath, bitmapTr)  //TR
             sendImage(2, defaultCategory, imgPath, bitmapBl)  //BL
             sendImage(3, defaultCategory, imgPath, bitmapBr)  //BR
+
+//            sendImage(0, defaultCategory, imgPath, bitmapBl)  //TL
         }
     }
 
@@ -129,7 +134,7 @@ class SecondFragment : Fragment() {
     }
 
     private fun sendImage(pos: Int, cat: String, filename: String, image: ByteArray, imgPath: String){
-        if (pos >= imgs)
+        if (pos > imgs)
         {
             println("Wrong pos value")
             return
@@ -142,32 +147,39 @@ class SecondFragment : Fragment() {
             Method.POST,
             ip[pos],
             Response.Listener {
-
-                responseData[pos] = JSONObject(String(it.data))
-                responseCount += 1
-                println("Label : ${responseData[pos]?.get("predict_label")}")
-
-                Log.d("TRIAL_APP_REQUEST", it.toString())
-                if (responseCount >= imgs)
+                var ignoreResponse = false
+                if (pos == imgs)
                 {
-                    var result: Int = 0
-                    Toast.makeText(thisContext, "Uploaded succesfully", Toast.LENGTH_SHORT).show()
+                    ignoreResponse = true
+                }
+                if (!ignoreResponse)
+                {
+                    responseData[pos] = JSONObject(String(it.data))
+                    responseCount += 1
+                    println("Label : ${responseData[pos]?.get("predict_label")}")
 
-                    result = calculateResult(responseData)
-
-                    var dataDir = context?.let { getDataDir(it) }
-
-                    if (dataDir != null)
+                    Log.d("TRIAL_APP_REQUEST", it.toString())
+                    if (responseCount >= imgs)
                     {
-                        var imgDir = "$dataDir/$result"
-                        Files.createDirectories(Paths.get(imgDir))
-                        Files.copy(Paths.get(imgPath), Paths.get("$imgDir/$filename"), StandardCopyOption.REPLACE_EXISTING)
+                        var result: String = ""
+                        Toast.makeText(thisContext, "Uploaded succesfully", Toast.LENGTH_SHORT).show()
+
+                        result = calculateResult(responseData)
+
+                        var dataDir = context?.let { getDataDir(it) }
+
+                        if (dataDir != null)
+                        {
+                            var imgDir = "$dataDir/$result"
+                            Files.createDirectories(Paths.get(imgDir))
+                            Files.copy(Paths.get(imgPath), Paths.get("$imgDir/$filename"), StandardCopyOption.REPLACE_EXISTING)
+                        }
+
+
+                        val args = requireArguments()
+                        args.putString("result", result.toString())
+                        findNavController().navigate(R.id.action_SecondFragment_to_ThirdFragment, args)
                     }
-
-
-                    val args = requireArguments()
-                    args.putString("result", result.toString())
-                    findNavController().navigate(R.id.action_SecondFragment_to_ThirdFragment, args)
                 }
             },
             Response.ErrorListener {
@@ -197,9 +209,59 @@ class SecondFragment : Fragment() {
 
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun calculateResult(responseData: Array<JSONObject?>): Int {
+    private fun floatArray2ByteArray(values: FloatArray): ByteArray {
+        val buffer = ByteBuffer.allocate(4 * values.size)
+        for (value in values) {
+            buffer.putFloat(value)
+        }
+        return buffer.array()
+    }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun calculateResult(responseData: Array<JSONObject?>): String {
+
+
+        val model = Comb.newInstance(requireContext())
+        // Creates inputs for reference.
+        val inputFeature0 = TensorBuffer.createFixedSize(intArrayOf(1, imgs * 10), DataType.FLOAT32)
+
+        var floatArray: FloatArray = FloatArray(imgs * 10)
+        var arrIndex = 0
+        for (i in 0 until imgs) {
+            var cArr: JSONArray = responseData[0]?.get("confidence") as JSONArray
+            for (j in 0..9) {
+                floatArray[arrIndex] = (cArr.get(j) as Double).toFloat()
+                arrIndex +=1
+
+            }
+        }
+        var byteArray: ByteArray = floatArray2ByteArray(floatArray)
+        var byteBuffer = ByteBuffer.wrap(byteArray)
+        inputFeature0.loadBuffer(byteBuffer)
+
+        // Runs model inference and gets result.
+        val outputs = model.process(inputFeature0)
+        val outputFeature0 = outputs.outputFeature0AsTensorBuffer
+
+        var result = "Error"
+        var modelOp = outputFeature0.floatArray
+        var resMax:Float = (-100).toFloat()
+        for (i in modelOp.indices)
+        {
+            if (modelOp[i] > resMax)
+            {
+                resMax = modelOp[i]
+                result = i.toString()
+            }
+        }
+
+        println(modelOp)
+        // Releases model resources if no longer used.
+        model.close()
+
+        return result
+
+        /*
         val cVal = Array(imgs) { DoubleArray(10) }
         for (i in 0 until imgs) {
             var cArr: JSONArray = responseData[0]?.get("confidence") as JSONArray
@@ -224,6 +286,7 @@ class SecondFragment : Fragment() {
         }
 
         return result
+         */
     }
 
     fun getDataDir(context: Context): String? {
