@@ -24,7 +24,6 @@ import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.nio.file.Files
-import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 
@@ -44,10 +43,11 @@ class SecondFragment : Fragment() {
 
     private var imageData: ByteArray? = null
 
-    private var responseData: Array<JSONObject?> = Array(4) { null }
+    private var imgs: Int = 1
+    private var responseData: Array<JSONObject?> = Array(imgs) { null }
     private var responseCount: Int = 0
     private var failureCount: Int = 0
-    private var ip: Array<String> = Array(4) { "" }
+    private var ip: Array<String> = Array(imgs) { "" }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -64,10 +64,10 @@ class SecondFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val imgPath = requireArguments().getString("CurrImage")
-        ip[0] = requireArguments().getString("ip0").orEmpty()
-        ip[1] = requireArguments().getString("ip1").orEmpty()
-        ip[2] = requireArguments().getString("ip2").orEmpty()
-        ip[3] = requireArguments().getString("ip3").orEmpty()
+        for (i in 0 until imgs)
+        {
+            ip[i] = requireArguments().getString("ip$i").orEmpty()
+        }
 
         val bitmap = BitmapFactory.decodeFile(File(imgPath).toString())
 
@@ -93,7 +93,7 @@ class SecondFragment : Fragment() {
 //        val adapter = ArrayAdapter<String>(requireActivity(),
 //            android.R.layout.simple_spinner_item, categories)
 //        category_spinner.adapter = adapter
-        val default_category = "Car"
+        val defaultCategory = "Car"
 
         binding.buttonSecond.setOnClickListener {
             val args = requireArguments()
@@ -102,18 +102,22 @@ class SecondFragment : Fragment() {
         }
 
         binding.buttonUpload.setOnClickListener {
-            val bitmap_tl = Bitmap.createBitmap(rotatedBitmap, 0, 0, rotatedBitmap.width/2, rotatedBitmap.height/2, null,true)
-            sendImage(0, default_category, imgPath, bitmap_tl)  //TL
-            val bitmap_tr = Bitmap.createBitmap(rotatedBitmap, rotatedBitmap.width/2, 0, rotatedBitmap.width/2, rotatedBitmap.height/2, null,true)
-            sendImage(1, default_category, imgPath, bitmap_tr)  //TR
-            val bitmap_bl = Bitmap.createBitmap(rotatedBitmap, 0, rotatedBitmap.height/2, rotatedBitmap.width/2, rotatedBitmap.height/2, null,true)
-            sendImage(2, default_category, imgPath, bitmap_bl)  //BL
-            val bitmap_br = Bitmap.createBitmap(rotatedBitmap, rotatedBitmap.width/2, rotatedBitmap.height/2, rotatedBitmap.width/2, bitmap.height/2, null,true)
-            sendImage(3, default_category, imgPath, bitmap_br)  //BR
+            val bitmapTl = Bitmap.createBitmap(rotatedBitmap, 0, 0, rotatedBitmap.width/2, rotatedBitmap.height/2, null,true)
+            val bitmapTr = Bitmap.createBitmap(rotatedBitmap, rotatedBitmap.width/2, 0, rotatedBitmap.width/2, rotatedBitmap.height/2, null,true)
+            val bitmapBl = Bitmap.createBitmap(rotatedBitmap, 0, rotatedBitmap.height/2, rotatedBitmap.width/2, rotatedBitmap.height/2, null,true)
+            val bitmapBr = Bitmap.createBitmap(rotatedBitmap, rotatedBitmap.width/2, rotatedBitmap.height/2, rotatedBitmap.width/2, bitmap.height/2, null,true)
+
+//            sendImage(0, defaultCategory, imgPath, rotatedBitmap)  //TL
+//            sendImage(0, defaultCategory, imgPath, bitmapBl)  //TL
+
+            sendImage(0, defaultCategory, imgPath, bitmapTl)  //TL
+            sendImage(1, defaultCategory, imgPath, bitmapTr)  //TR
+            sendImage(2, defaultCategory, imgPath, bitmapBl)  //BL
+            sendImage(3, defaultCategory, imgPath, bitmapBr)  //BR
         }
     }
 
-    fun sendImage(pos: Int, cat: String, imgPath: String?, rotatedBitmap: Bitmap){
+    private fun sendImage(pos: Int, cat: String, imgPath: String?, rotatedBitmap: Bitmap){
         val stream = ByteArrayOutputStream()
         rotatedBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
         val image = stream.toByteArray()
@@ -124,7 +128,12 @@ class SecondFragment : Fragment() {
         }
     }
 
-    fun sendImage(pos: Int, cat: String, filename: String, image: ByteArray, imgPath: String){
+    private fun sendImage(pos: Int, cat: String, filename: String, image: ByteArray, imgPath: String){
+        if (pos >= imgs)
+        {
+            println("Wrong pos value")
+            return
+        }
         imageData = image
         val queue = Volley.newRequestQueue(thisContext)
 //        val url = "http://192.168.0.141:8080/upload"
@@ -139,7 +148,7 @@ class SecondFragment : Fragment() {
                 println("Label : ${responseData[pos]?.get("predict_label")}")
 
                 Log.d("TRIAL_APP_REQUEST", it.toString())
-                if (responseCount >= 4)
+                if (responseCount >= imgs)
                 {
                     var result: Int = 0
                     Toast.makeText(thisContext, "Uploaded succesfully", Toast.LENGTH_SHORT).show()
@@ -191,8 +200,8 @@ class SecondFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     fun calculateResult(responseData: Array<JSONObject?>): Int {
 
-        val cVal = Array(4) { DoubleArray(10) }
-        for (i in 0..3) {
+        val cVal = Array(imgs) { DoubleArray(10) }
+        for (i in 0 until imgs) {
             var cArr: JSONArray = responseData[0]?.get("confidence") as JSONArray
             for (j in 0..9) {
                 cVal[i][j] = cArr.get(j) as Double
@@ -202,7 +211,11 @@ class SecondFragment : Fragment() {
         var result = -1
         var maxSum: Double = 0.0
         for (i in 0..9) {
-            sVal[i] = cVal[0][i] + cVal[1][i] + cVal[2][i] + cVal[3][i]
+            sVal[i] = 0.0
+            for (j in 0 until imgs) {
+                sVal[i] += cVal[j][i]
+            }
+
             if (sVal[i] > maxSum)
             {
                 maxSum = sVal[i]

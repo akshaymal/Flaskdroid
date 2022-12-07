@@ -29,6 +29,12 @@ def upload_file():
 	appropriate directory.
 	"""
 	from app import classifier
+	# from app import classifier1
+	# from app import classifier2
+	# from app import classifier3
+	# from app import classifier4
+	# from app import classifiercomb
+
 	label = -1
 	storage_status = "Not Saved!"
 
@@ -80,7 +86,10 @@ def upload_file():
 	gray = cv2.morphologyEx(gray, cv2.MORPH_CLOSE, kernel)
 	cv2.imwrite("images/gray_4_closed.jpg", gray)
 	# Resizing into 224x224
-	gray = cv2.resize(gray, (224, 224), interpolation=cv2.INTER_AREA)
+
+#	gray = cv2.resize(gray, (224, 224), interpolation=cv2.INTER_AREA)
+	gray = cv2.resize(gray, (14, 14), interpolation=cv2.INTER_AREA)
+
 	(thresh, gray) = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
 	cv2.imwrite("images/gray_5_resized.jpg", gray)
 	cv2.imwrite("images/thresh.jpg", thresh)
@@ -132,15 +141,37 @@ def upload_file():
 
 	# Model related
 	gray = gray.astype("float32") / 255
-	gray_im = np.expand_dims(gray, 0)
-	# gray_im = classifier.preprocess_data(custom_data=gray, input=True)
-	print(gray_im.shape)
 
+	# gray1 = gray[:14, :14]
+	# gray2 = gray[:14, 14:]
+	# gray3 = gray[14:, :14]
+	# gray4 = gray[14:, 14:]
+
+	gray_im = np.expand_dims(gray, 0)
+	# gray_im1 = np.expand_dims(gray1, 0)
+	# gray_im2 = np.expand_dims(gray2, 0)
+	# gray_im3 = np.expand_dims(gray3, 0)
+	# gray_im4 = np.expand_dims(gray4, 0)
+
+	# gray_im = classifier.preprocess_data(custom_data=gray, input=True)
+
+	print(gray_im.shape)
+	# print(gray_im1.shape)
+
+	# predict1_results = classifier1.predict(gray_im1)
+	# predict2_results = classifier2.predict(gray_im2)
+	# predict3_results = classifier3.predict(gray_im3)
+	# predict4_results = classifier4.predict(gray_im4)
+	# predictcomb_results = np.concatenate(
+	# 		(predict1_results, 
+	# 		predict2_results,
+	# 		predict3_results,
+	# 		predict4_results), axis=1)
+	# print(predictcomb_results.shape)
+	# predictcomb_results = classifiercomb.predict(predictcomb_results)
+	# predict_results = predictcomb_results
 
 	predict_results = classifier.predict(gray_im)
-
-
-	# predict_results = classifier.predict(rgbimage)
 	print(predict_results)
 
 	label = np.argmax(predict_results)
@@ -168,4 +199,4 @@ def upload_file():
 
 
 if __name__ == "__main__":
-	app.run(host="192.168.0.51", port=8080)
+	app.run(host="192.168.0.141", port=8080)
