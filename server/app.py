@@ -13,7 +13,7 @@ classifier = None
 # classifiercomb = None
 
 # BOTTOM LEFT
-model_folder_name = "tl_model"
+model_folder_name = "br_model"
 # model1_folder_name = "tl_model"
 # model2_folder_name = "tr_model"
 # model3_folder_name = "bl_model"

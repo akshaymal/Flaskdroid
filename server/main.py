@@ -176,9 +176,8 @@ def upload_file():
 
 	label = np.argmax(predict_results)
 	print("Prediction:")
-	print(predict_results*100)
-	pred = np.round(predict_results*100,3)
-	print(np.round(predict_results,3))
+	pred = np.round(predict_results,5)
+	print(pred)
 	print("Label:")
 	print(label)
 

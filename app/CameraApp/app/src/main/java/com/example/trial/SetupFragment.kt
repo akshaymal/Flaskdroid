@@ -58,26 +58,28 @@ class SetupFragment : Fragment() {
             var ip1 = ipPre + trIPText.text.toString() + ":8000/upload"
             var ip2 = ipPre + blIPText.text.toString() + ipPort
             var ip3 = ipPre + brIPText.text.toString() + ipPort
+            var ip4 = "http://192.168.0.141:8090/upload"
             val args = Bundle()
             args.putString("ip0", ip0)
             args.putString("ip1", ip1)
             args.putString("ip2", ip2)
             args.putString("ip3", ip3)
+            args.putString("ip4", ip4)
             findNavController().navigate(R.id.action_SetupFragment_to_FirstFragment, args)
         }
 
         binding.setDefaultButton.setOnClickListener {
-            val ipDef = "http://192.168.0.141"
-            var ipPort = ":8080/upload"
-            var ip0 = "http://192.168.0.141:8080/upload"
-            var ip1 = "http://192.168.0.141:8000/upload"
-            var ip2 = "http://192.168.0.216:8080/upload"
-            var ip3 = "http://192.168.0.51:8080/upload"
+            var ip0 = "http://192.168.0.141:8020/upload"
+            var ip1 = "http://192.168.0.141:8040/upload"
+            var ip2 = "http://192.168.0.141:8060/upload"
+            var ip3 = "http://192.168.0.141:8080/upload"
+            var ip4 = "http://192.168.0.141:8090/upload"
             val args = Bundle()
             args.putString("ip0", ip0)
             args.putString("ip1", ip1)
             args.putString("ip2", ip2)
             args.putString("ip3", ip3)
+            args.putString("ip4", ip4)
             findNavController().navigate(R.id.action_SetupFragment_to_FirstFragment, args)
         }
 
