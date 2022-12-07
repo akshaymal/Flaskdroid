@@ -91,7 +91,7 @@ class MidFragment : Fragment(), EasyPermissions.PermissionCallbacks {
                     Log.d(TAG, msg)
 
                     val stringUri: String = photoFile.absolutePath
-                    val args = Bundle()
+                    val args = requireArguments()
                     args.putString("CurrImage", stringUri)
                     findNavController().navigate(R.id.action_midFragment_to_SecondFragment, args)
                 }
